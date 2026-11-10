@@ -277,6 +277,16 @@ class Engine(BaseEngine):
                     else None
                 )
                 self.image = self.image.quantize(method=quantize_method)
+                # quantize() keeps alpha in the palette but does not set
+                # info["transparency"], so the GIF writer would drop the
+                # transparent index. Restore it from the fully transparent
+                # palette entry.
+                palette = self.image.getpalette("RGBA")
+                if palette and "transparency" not in self.image.info:
+                    for index in range(len(palette) // 4):
+                        if palette[index * 4 + 3] == 0:
+                            self.image.info["transparency"] = index
+                            break
 
         ext = requested_extension or self.get_default_extension()
 
