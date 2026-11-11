@@ -41,3 +41,22 @@ class ExtremeAspectCropTestCase(TestCase):
         width, height = engine.resize.call_args[0]
         self.assertGreaterEqual(height, 1)
         self.assertGreaterEqual(width, 1)
+
+    def test_fit_in_width_only_zero_target_height_no_zero_division(self):
+        engine = MagicMock()
+        engine.size = (940, 2)
+
+        context = MagicMock()
+        context.request.adaptive = False
+        context.request.full = False
+        context.request.width = 100
+        context.request.height = 0
+
+        transformer = Transformer(context)
+        transformer.engine = engine
+        transformer.target_width = 100.0
+        transformer.target_height = 0.0
+
+        transformer.fit_in_resize()
+
+        engine.resize.assert_called_once_with(100, 1)

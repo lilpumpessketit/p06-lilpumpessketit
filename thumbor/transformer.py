@@ -391,7 +391,7 @@ class Transformer:
 
         # add 1e-5 to get .5 rounding up in Python3 as it was in Python2
         if (
-            source_width / self.target_width * sign
+            not self.target_height or source_width / self.target_width * sign
             >= source_height / self.target_height * sign
         ):
             resize_height = round(
